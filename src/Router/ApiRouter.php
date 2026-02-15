@@ -18,11 +18,51 @@ class ApiRouter extends BaseRouter
 
     private string $namespace;
 
-    public function __construct(string $namespace)
+    public function __construct(App $app)
     {
-        $this->namespace = $namespace;
+        $this->namespace = $app->config->get('API_NAMESPACE');
     }
-    public function __xconstruct(string $path)
+    public function getService(): string
+    {
+        return $this->service;
+    }
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+    public function route(string $path): void
+    {
+        try {
+            $this->path = $path;
+            $this->path_pieces = explode('/', $path);
+            $module = $this->path_pieces[1];
+            $service = $this->path_pieces[2];
+            $method = $this->path_pieces[3];
+
+            $this->service_class_name = "{$this->namespace}\\{$module}\\{$service}";
+            $this->controller = new $this->service_class_name();
+
+            $params = $this->getParams() ?? [];
+            $response = new JsonResponse(
+                $this->controller->{$method}(...$params)
+            );
+            $response->send();
+        } catch (\Exception $e) {
+            $response = new JsonResponse(
+                [
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode()
+                ],
+                [],
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            $response->send();
+        }
+    }
+
+
+
+    public function xxx__xconstruct(string $path)
     {
         $this->path = $path;
         $this->path_pieces = explode('/', $path);
@@ -63,43 +103,5 @@ class ApiRouter extends BaseRouter
             'Method' => $this->method,
             'Params' => print_r($this->params, true),
             'Route Type' => $this->route_type], LogLevel::DEBUG, 'router');
-    }
-    public function getService(): string
-    {
-        return $this->service;
-    }
-    public function getMethod(): string
-    {
-        return $this->method;
-    }
-
-    public function route(string $path): void
-    {
-        try {
-            $this->path = $path;
-            $this->path_pieces = explode('/', $path);
-            $module = $this->path_pieces[1];
-            $service = $this->path_pieces[2];
-            $method = $this->path_pieces[3];
-
-            $this->service_class_name = "{$this->namespace}\\{$module}\\{$service}";
-            $this->controller = new $this->service_class_name();
-
-            $params = $this->getParams() ?? [];
-            $response = new JsonResponse(
-                $this->controller->{$method}(...$params)
-            );
-            $response->send();
-        } catch (\Exception $e) {
-            $response = new JsonResponse(
-                [
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode()
-                ],
-                [],
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            $response->send();
-        }
     }
 }

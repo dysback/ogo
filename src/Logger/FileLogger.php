@@ -17,7 +17,6 @@ class FileLogger extends BaseLogger implements ILogger
         $this->logFilePath = $app->config->get('LOGGER.LOG_FILE_PATH');
         $this->logLevel = $app->config->get('LOGGER.LOG_LEVEL');
         $this->application = $app->config->get('APPLICATION_NAME');
-        echo print_r("FileLogger: " . $this->logFilePath . " " . $this->logLevel . " " . $this->application, true);
         $this->log("Logger initiated, Log level " . $this->logLevel, LogLevel::DEBUG, 'core');
     }
 

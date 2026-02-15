@@ -1,5 +1,4 @@
 /vendor/
-.php-cs-fixer.cache
-.vscode/
-composer.lock
-
+/.php-cs-fixer.cache
+/.vscode/
+/composer.lock
