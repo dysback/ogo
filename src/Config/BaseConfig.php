@@ -1,7 +1,9 @@
 <?php
 
 namespace Dysback\Ogo\Config;
+
 use Dysback\Ogo\App;
+
 /**
  * Base class for all config classes.
  */
@@ -9,28 +11,6 @@ abstract class BaseConfig implements IConfig
 {
     protected readonly App $app;
     public protected(set) array $config = [];
-    //protected static IConfig $instance;
-
-/*
-    protected function __clone(): void
-    {
-        throw new \Exception('Cannot clone singleton');
-    }
-
-    public function __wakeup(): void
-    {
-        throw new \Exception('Cannot unserialize singleton');
-    }
-
-    public static function getInstance(): IConfig
-    {
-        if (!isset(static::$instance)) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
-    }
-*/
     public function get(string $key, $default = null)
     {
         $keys = explode('.', $key);

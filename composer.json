@@ -1,6 +1,7 @@
 {
     "name": "dysback/ogo",
     "description": "OGO, a thin PHP framework!",
+    "version": "0.0.2",
     "type": "library",
     "license": "GPL-3.0-only",
     "autoload": {

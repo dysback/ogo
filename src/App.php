@@ -5,6 +5,8 @@ namespace Dysback\Ogo;
 class App
 {
     public readonly array $configPaths;
+    public readonly string $basePath;
+    public readonly string $environment;
     private static ?App $instance = null;
     public private(set) readonly Config\IConfig $config;
     public private(set) readonly Logger\ILogger $logger;
@@ -13,10 +15,15 @@ class App
     //public private(set) Cache\ICache $Cache;
     public private(set) array $others = [];
 
-    public static function initialize(array $configPaths): App
-    {
+    public static function initialize(
+        array $configPaths,
+        string $basePath,
+        string $environment
+    ): App {
         self::$instance = new self();
         self::$instance->configPaths = $configPaths;
+        self::$instance->basePath = $basePath;
+        self::$instance->environment = $environment;
         return self::$instance;
     }
 
