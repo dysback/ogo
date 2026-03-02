@@ -164,19 +164,4 @@ class Config extends BaseConfig implements IConfig
     {
         return $this->get($section, []);
     }
-
-    private function arrayMergeRecursive(array $array1, array $array2): array
-    {
-        $merged = $array1;
-
-        foreach ($array2 as $key => $value) {
-            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
-                $merged[$key] = $this->arrayMergeRecursive($merged[$key], $value);
-            } else {
-                $merged[$key] = $value;
-            }
-        }
-
-        return $merged;
-    }
 }

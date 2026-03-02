@@ -4,49 +4,92 @@ namespace Dysback\Ogo\Router;
 
 use Dysback\Ogo\App;
 use Dysback\Ogo\Logger\LogLevel;
+use Dysback\Ogo\Response\JsonResponse;
+use Dysback\Ogo\Response\StatusCode;
+use Dysback\Ogo\View\HtmlView;
+use Dysback\Ogo\View\GeneralView;
+use Dysback\Ogo\View\MustacheView;
+use Dysback\Ogo\View\IView;
 
+/**
+ * Page router class. Renders a view template and returns the response.
+ * @package Dysback\Ogo\Router
+ */
 class PageRouter extends BaseRouter
 {
-    protected $view;
-    protected $view_class_name;
-    protected $operation;
-    protected $params = [];
+    public private(set) IView $view;
+    protected string $view_class_name;
+    protected string $operation;
 
-    public function __construct(string $path)
+    public function __construct(App $app)
+    {
+        $this->app = $app;
+        $this->namespace = $app->config->get('APP_NAMESPACE');
+    }
+
+    public function route(string $path): void
     {
         $this->path = $path;
         $this->path_pieces = explode('/', $path);
+        $module = $this->path_pieces[1];
+        $view_name = $this->path_pieces[2];
+        $operation = $this->path_pieces[3] ?? '';
+        $params = array_slice($this->path_pieces, 4);
+        $logger = $this->app->logger;
+
         if (count($this->path_pieces) < 3) {
-            http_response_code(404);
-            die("Path is too short: " . $this->path);
+            $logger->log("Path is too short: " . $this->path, LogLevel::DEBUG, 'router');
+            $response = new JsonResponse([
+                'error' => 'Path is too short',
+                'path' => $this->path,
+                'path_pieces' => $this->path_pieces,
+                'module' => $module,
+                'view' => $view_name,
+                'operation' => $operation,
+                'params' => $params,
+            ], [], StatusCode::NOT_FOUND);
         }
-        $this->module = $this->path_pieces[1];
-        $this->view = $this->path_pieces[2];
-        $this->operation = $this->path_pieces[3] ?? '';
-        $this->params = array_slice($this->path_pieces, 4);
+        $logger->log(
+            [
+                "Path: " . $this->path,
+                "Path Pieces: " . implode(', ', $this->path_pieces),
+                "Module: " . $module,
+                "View: " . $view_name,
+                "Params: " . implode(', ', $params),
+                "Route Type: " . $this->route_type
+            ],
+            LogLevel::DEBUG,
+            'router'
+        );
 
-        App::getInstance()->Logger->log("Path: " . $this->path, LogLevel::DEBUG, 'router');
-        App::getInstance()->Logger->log("Path Pieces: " . implode(', ', $this->path_pieces), LogLevel::DEBUG, 'router');
-        App::getInstance()->Logger->log("Module: " . $this->module, LogLevel::DEBUG, 'router');
-        App::getInstance()->Logger->log("View: " . $this->view, LogLevel::DEBUG, 'router');
-        App::getInstance()->Logger->log("Params: " . implode(', ', $this->params), LogLevel::DEBUG, 'router');
-        App::getInstance()->Logger->log("Route Type: " . $this->route_type, LogLevel::DEBUG, 'router');
-    }
-
-
-
-    public function route(): void
-    {
-        $this->view_class_name = "Mct\Live\View\\{$this->module}\\{$this->view}";
+        $this->view_class_name = "{$this->namespace}\\{$module}\\{$view_name}";
         if (!class_exists($this->view_class_name)) {
             http_response_code(404);
             die("Page not found: " . $this->path);
         }
-        $this->view = new $this->view_class_name($this->getParams() ?? []);
-        if ($this->operation) {
-            $this->view->{$this->operation}(... $this->params);
+        //$logger->log("View class name: " . $this->view_class_name, LogLevel::DEBUG, 'router');
+        $this->view = new $this->view_class_name();
+        //$this->view->operation = $operation;
+        $this->view->{$operation}(...$params);
+
+        if (is_subclass_of($this->view, HtmlView::class)) {
+            $this->view->render();
+
+            $pieces = explode('\\', $this->view_class_name);
+            $template = $pieces[count($pieces) - 2] . '/' . $pieces[count($pieces) - 1];
+            $template_path = App::getInstance()->config->get('VIEWS_FOLDER') . $template . '.tmpl.php';    
+            if (file_exists($template_path)) {
+                require $template_path;
+            } else {
+                echo "Template not found: " . $template_path . print_r($pieces, true);
+            }
+        } elseif (is_subclass_of($this->view, GeneralView::class)) {
+            $this->view->render();
+        } elseif (is_subclass_of($this->view, MustacheView::class)) {
+            $this->view->render();
         }
-        App::getInstance()->$view = $this->view;
-        require BASE_PATH . 'src/views/templates/master-templates/' . $this->view->getMasterTemplate();
     }
 }
+
+
+

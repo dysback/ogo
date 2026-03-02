@@ -8,6 +8,11 @@ class JsonResponse extends BaseResponse implements IResponse
     {
         parent::__construct($body, array_merge($headers, ['Content-Type' => 'application/json']), $statusCode);
     }
+
+    /**
+     * Send the response to the client as JSON, including the headers and status code.
+     * @return void
+     */
     public function send(): void
     {
         parent::send();

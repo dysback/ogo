@@ -2,6 +2,9 @@
 
 namespace Dysback\Ogo\Config;
 
+/**
+ * Enum for config file types. (PHP, JSON, YAML, YML, DIR)
+ */
 enum ConfigFileType: string
 {
     case PHP = 'php';

@@ -2,6 +2,10 @@
 
 namespace Dysback\Ogo\Response;
 
+/**
+ * Enum for status codes.
+ * @package Dysback\Ogo\Response
+ */
 enum StatusCode: int
 {
     case OK = 200;

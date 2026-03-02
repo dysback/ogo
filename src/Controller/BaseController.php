@@ -2,6 +2,10 @@
 
 namespace Dysback\Ogo\Controller;
 
+/**
+ * Base class for all controllers. UNUSED FOR NOW.
+ * @package Dysback\Ogo\Controller
+ */
 abstract class BaseController implements IController
 {
     //public abstract function __construct(array $data = []);

@@ -3,14 +3,14 @@
 namespace Dysback\Ogo\Router;
 
 use Dysback\Ogo\App;
-use Dysback\Ogo\Response\JsonResponse;
 use Dysback\Ogo\Response\StatusCode;
+use Dysback\Ogo\Response\HtmlResponse;
 
 /**
- * Api router class. (JSON REST API response)
+ * General router class. Lets user method return the response directly.
  * @package Dysback\Ogo\Router
  */
-class ApiRouter extends BaseRouter
+class GeneralRouter extends BaseRouter
 {
     private string $service_class_name;
     private RequestType $request_type;
@@ -39,12 +39,9 @@ class ApiRouter extends BaseRouter
             $controller = new $this->service_class_name();
 
             $params = $this->getParams() ?? [];
-            $response = new JsonResponse(
-                $controller->{$method}(...$params)
-            );
-            $response->send();
+            $controller->{$method}(...$params);
         } catch (\Exception $e) {
-            $response = new JsonResponse(
+            $response = new HtmlResponse(
                 [
                     'message' => $e->getMessage(),
                     'code' => $e->getCode()

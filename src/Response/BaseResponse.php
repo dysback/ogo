@@ -2,6 +2,10 @@
 
 namespace Dysback\Ogo\Response;
 
+/**
+ * Base class for all responses.
+ * @package Dysback\Ogo\Response
+ */
 abstract class BaseResponse implements IResponse
 {
     protected StatusCode $statusCode;
@@ -15,21 +19,10 @@ abstract class BaseResponse implements IResponse
         $this->statusCode = $statusCode;
     }
 
-    public function getStatusCode(): StatusCode
-    {
-        return $this->statusCode;
-    }
-
-    public function getHeaders(): array
-    {
-        return $this->headers;
-    }
-
-    public function getBody(): mixed
-    {
-        return $this->body;
-    }
-
+    /**
+     * Send the response to the client, including the headers and status code.
+     * @return void
+     */
     public function send(): void
     {
         foreach ($this->headers as $key => $value) {

@@ -2,19 +2,29 @@
 
 namespace Dysback\Ogo\Logger;
 
-class LogLevel
+/**
+ * Enum for log levels. (FATAL, ERROR, WARNING, INFO, DEBUG, VERBOSE)
+ * FATAL is the highest log level and will be logged always.
+ * ERROR will be logged if the log level is FATAL or ERROR.
+ * WARNING will be logged if the log level is FATAL, ERROR or WARNING.
+ * INFO will be logged if the log level is FATAL, ERROR, WARNING or INFO.
+ * DEBUG will be logged if the log level is FATAL, ERROR, WARNING, INFO or DEBUG.
+ * VERBOSE will be logged if the log level is FATAL, ERROR, WARNING, INFO, DEBUG or VERBOSE.
+ * @package Dysback\Ogo\Logger
+ */
+enum LogLevel: string
 {
-    public const FATAL = 'FATAL';
-    public const ERROR = 'ERROR';
-    public const WARNING = 'WARNING';
-    public const INFO = 'INFO';
-    public const DEBUG = 'DEBUG';
-    public const VERBOSE = 'VERBOSE';
+    case FATAL = 'FATAL';
+    case ERROR = 'ERROR';
+    case WARNING = 'WARNING';
+    case INFO = 'INFO';
+    case DEBUG = 'DEBUG';
+    case VERBOSE = 'VERBOSE';
 
     private const LLA = [
-        'FATAL->FATAL' => true,     'FATAL->ERROR' => true,     'FATAL->WARNING' => true,
-        'FATAL->INFO' => true,      'FATAL->DEBUG' => true,     'FATAL->VERBOSE' => true,
-        'ERROR->FATAL' => false,    'ERROR->ERROR' => true,     'ERROR->WARNING' => true,
+        'FATALFATAL' => true,       'FATALERROR' => true,       'FATALWARNING' => true,
+        'FATALINFO' => true,        'FATALDEBUG' => true,       'FATALVERBOSE' => true,
+        'ERRORFATAL' => false,      'ERRORERROR' => true,       'ERRORWARNING' => true,
         'ERRORINFO' => true,        'ERRORDEBUG' => true,       'ERRORVERBOSE' => true,
         'WARNINGFATAL' => false,    'WARNINGERROR' => false,    'WARNINGWARNING' => true,
         'WARNINGINFO' => true,      'WARNINGDEBUG' => true,     'WARNINGVERBOSE' => true,
@@ -26,24 +36,14 @@ class LogLevel
         'VERBOSEINFO' => false,     'VERBOSEDEBUG' => false,    'VERBOSEVERBOSE' => true,
     ];
 
-    public static function shouldLog($logLevel, $actualLogLevel)
+    /**
+     * Check if a log level should be logged.
+     * @param LogLevel $logLevel The log level to check.
+     * @param LogLevel $actualLogLevel The actual log level.
+     * @return bool True if the log level should be logged, false otherwise.
+     */
+    public static function shouldLogA(LogLevel $logLevel, LogLevel $actualLogLevel)
     {
-        if ($logLevel == static::FATAL) {
-            return true;
-        } elseif ($logLevel == static::ERROR && ($actualLogLevel == static::FATAL)) {
-            return false;
-        } elseif ($logLevel == static::WARNING && ($actualLogLevel == static::FATAL || $actualLogLevel == static::ERROR)) {
-            return false;
-        } elseif ($logLevel == static::INFO && $actualLogLevel && ($actualLogLevel == static::FATAL || $actualLogLevel == static::ERROR || $actualLogLevel == static::WARNING)) {
-            return false;
-        } elseif ($logLevel == static::DEBUG && $actualLogLevel != static::DEBUG && $actualLogLevel != static::VERBOSE) {
-            return false;
-        } elseif ($logLevel == static::VERBOSE && $actualLogLevel != static::VERBOSE) {
-            return false;
-        }
-    }
-    public static function shouldLogA($logLevel, $actualLogLevel)
-    {
-        return static::LLA[$logLevel . $actualLogLevel];
+        return static::LLA[$logLevel->value . $actualLogLevel->value];
     }
 }
