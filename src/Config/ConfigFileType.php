@@ -11,5 +11,6 @@ enum ConfigFileType: string
     case JSON = 'json';
     case YAML = 'yaml';
     case YML = 'yml';
+    case ENV = 'env';
     case DIR = '*';
 }

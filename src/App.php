@@ -11,7 +11,7 @@ class App
     public private(set) readonly Config\IConfig $config;
     public private(set) readonly Logger\ILogger $logger;
     public private(set) readonly Router\IRouter $router;
-    //public private(set) Database\IDatabase $Database;
+    public private(set) ?Database\IDatabase $database = null;
     //public private(set) Cache\ICache $Cache;
     public private(set) array $others = [];
 
@@ -59,5 +59,10 @@ class App
     public function setRouter(Router\IRouter $router): void
     {
         $this->router = $router;
+    }
+
+    public function setDatabase(Database\IDatabase $database): void
+    {
+        $this->database = $database;
     }
 }
